@@ -1,0 +1,24 @@
+table {
+  margin: auto;
+  border: 1px solid black;
+  border-spacing: 0;
+}
+
+body {
+  font-family: monospace;
+  text-align: center;
+}
+
+input {
+  display: block;
+  margin-top: 10px;
+}
+
+span.container {
+  margin: 15px;
+  display: inline-block;
+}
+
+span.subtitle {
+  display: block;
+}
