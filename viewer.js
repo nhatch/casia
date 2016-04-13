@@ -22,10 +22,6 @@ function shortFromLittleEndianByteArray(bytes) {
   return bytes[0] + bytes[1]*Math.pow(2,8);
 }
 
-function shortFromBigEndianByteArray(bytes) {
-  return bytes[0]*Math.pow(2,8) + bytes[1];
-}
-
 function intFromLittleEndianByteArray(bytes) {
   return bytes[0] + bytes[1]*Math.pow(2,8) + bytes[2]*Math.pow(2,16) + bytes[3]*Math.pow(2,24);
 }
