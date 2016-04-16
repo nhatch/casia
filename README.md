@@ -6,8 +6,8 @@ Currently I am merely trying to use [keras](http://keras.io/) to train a CNN tha
 
 The model is not yet learning at all, but if you want to try it, run this in the Python interpreter:
 
-  import run
-  run.run(3)
+    import run
+    run.run(3) # 3 epochs
 
 ## CASIA viewer
 
@@ -20,7 +20,7 @@ A viewer for characters from the CASIA dataset. Usage:
 
 My research advisor for this project is [Greg Shakhnarovich](http://ttic.uchicago.edu/~gregory/).
 
-The CNN architecture in vgg.py is taken from [this paper](http://arxiv.org/pdf/1409.1556.pdf).
+The CNN architecture in `vgg.py` is taken from [this paper](http://arxiv.org/pdf/1409.1556.pdf).
 
-Conversion of GB-2312 character codes into displayable strings is accomplished using encoding.js and encoding-indexes.js, both of which are taken from [inexorabletash/text-encoding](https://github.com/inexorabletash/text-encoding).
+Conversion of GB-2312 character codes into displayable strings is accomplished using `encoding.js` and `encoding-indexes.js`, both of which are taken from [inexorabletash/text-encoding](https://github.com/inexorabletash/text-encoding).
 
