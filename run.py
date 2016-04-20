@@ -5,7 +5,8 @@ import sys
 from keras import backend as K
 
 X_train, Y_train = casia.load()
-model = vgg.vgg16(X_train[0].shape, len(Y_train[0]))
+num_classes = len(Y_train[0])
+model = vgg.vgg16(X_train[0].shape, num_classes)
 
 def run(nb_epoch):
   train(nb_epoch)
@@ -16,7 +17,7 @@ def train(nb_epoch):
 
 def test():
   predictions = model.predict_classes(X_train, batch_size=32)
-  predictions = np_utils.to_categorical(predictions)
+  predictions = np_utils.to_categorical(predictions, num_classes)
   nb_correct = len(filter(lambda(x,y): all(x == y), zip(predictions, Y_train)))
   accuracy = float(nb_correct) / len(Y_train)
   print "accuracy: {}".format(accuracy)
