@@ -17,10 +17,15 @@ def train(nb_epoch):
 
 def test():
   predictions = model.predict_classes(X_train, batch_size=32)
-  predictions = np_utils.to_categorical(predictions, num_classes)
-  nb_correct = len(filter(lambda(x,y): all(x == y), zip(predictions, Y_train)))
-  accuracy = float(nb_correct) / len(Y_train)
-  print "accuracy: {}".format(accuracy)
+  predictions_c = np_utils.to_categorical(predictions, num_classes)
+  incorrect = filter(lambda(i, (x,y)): not all(x == y), enumerate(zip(predictions_c, Y_train)))
+  errors = len(incorrect)
+  if errors > 0:
+    for i, (x,y) in incorrect:
+      print "Should have been {}, predicted {}:".format(i, predictions[i])
+      print inspect_layer(-2, i)
+  print "error rate: {} / {}".format(errors, len(Y_train))
+
 
 
 ### Debugging Tools ###
@@ -30,20 +35,23 @@ def test():
 def visualize(img_2d):
   for row in img_2d:
     for cell in row:
-      if cell < 0.5:
+      if cell < 0.0:
         v = "#"
-      elif cell < 0.8:
+      elif cell < 0.3:
         v = "."
       else:
         v = " "
       sys.stdout.write(v)
     print
 
+def v(img_index):
+  visualize(X_train[img_index][0])
+
 # Gives the output of the layer of `model` identified by `layer_idx`
 # when the input is `datum`.
-# Example: visualize_layer(model, 2, X_train[0])
-def inspect_layer(model, layer_idx, datum):
+# Example: inspect_layer(2, 0)
+def inspect_layer(layer_idx, datum_idx):
   get_layer_output = K.function([model.layers[0].input], [model.layers[layer_idx].output])
-  layer_output = get_layer_output([[datum]])[0]
+  layer_output = get_layer_output([[X_train[datum_idx]]])[0]
   return layer_output
 
