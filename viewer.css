@@ -17,8 +17,10 @@ input {
 span.container {
   margin: 15px;
   display: inline-block;
+  vertical-align: top;
 }
 
-span.subtitle {
-  display: block;
+div {
+  display: inline-block;
+  width: 300px;
 }

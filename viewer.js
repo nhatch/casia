@@ -1,7 +1,4 @@
 
-var images = [];
-
-
 function loadGnt(filename, imageArray, callback) {
   var req = new XMLHttpRequest();
   req.onload = function() {
@@ -46,14 +43,23 @@ function constructImages(gnt, imageArray) {
   }
 }
 
-loadGnt("example.gnt", images, function () {
-  var imageBrowserDiv = document.createElement("div");
-  //var incorrectPredictionsDiv = document.createElement("div");
-  createDynamicViewer(imageBrowserDiv, images, 0);
-  //createIncorrectPredictionViewers(incorrectPredictionsDiv);
-  document.body.appendChild(imageBrowserDiv);
-  //document.body.appendChild(incorrectPredictionsDiv);
-});
+function renderFile(filename) {
+  var images = [];
+  loadGnt(filename, images, function () {
+    var imageBrowserDiv = document.createElement("div");
+    var p = document.createElement("p");
+    p.innerHTML = filename;
+    imageBrowserDiv.appendChild(p);
+    createDynamicViewer(imageBrowserDiv, images, 0);
+    document.body.appendChild(imageBrowserDiv);
+  });
+}
+
+var filenames = ["gnts/1241-c.gnt", "gnts/1242-c.gnt", "gnts/1243-c.gnt"]
+
+for (var i = 0; i < filenames.length; i++) {
+  renderFile(filenames[i]);
+}
 
 function createDynamicViewer(div, imageArray, startingIndex) {
   var image = imageArray[startingIndex];
