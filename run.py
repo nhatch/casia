@@ -7,25 +7,21 @@ from keras import backend as K
 X_train, Y_train = casia.load()
 num_classes = len(Y_train[0])
 model = vgg.vgg16(X_train[0].shape, num_classes)
+BATCH_SIZE = 16 # setting this too high causes ENOMEM on a GPU
 
 def run(nb_epoch):
   train(nb_epoch)
   test()
 
 def train(nb_epoch):
-  model.fit(X_train, Y_train, batch_size=32, nb_epoch=nb_epoch)
+  model.fit(X_train, Y_train, batch_size=BATCH_SIZE, nb_epoch=nb_epoch)
 
 def test():
-  predictions = model.predict_classes(X_train, batch_size=32)
+  predictions = model.predict_classes(X_train, batch_size=BATCH_SIZE)
   predictions_c = np_utils.to_categorical(predictions, num_classes)
   incorrect = filter(lambda(i, (x,y)): not all(x == y), enumerate(zip(predictions_c, Y_train)))
   errors = len(incorrect)
-  if errors > 0:
-    for i, (x,y) in incorrect:
-      print "Should have been {}, predicted {}:".format(i, predictions[i])
-      print inspect_layer(-2, i)
   print "error rate: {} / {}".format(errors, len(Y_train))
-
 
 
 ### Debugging Tools ###

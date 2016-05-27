@@ -3,7 +3,7 @@ import scipy.misc
 import numpy
 import keras.utils.np_utils as np_utils
 
-NB_EXAMPLES = 32
+NB_EXAMPLES = 64
 SIDE = 224 # must be a multiple of 32 to work with maxpooling in vgg16
 
 def load(side=SIDE):
