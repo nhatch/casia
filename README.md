@@ -4,10 +4,15 @@ This repo houses the code for a research investigation into recognizing characte
 
 Currently I am merely trying to use [keras](http://keras.io/) to train a CNN that can recognize characters offline isolated characters (.gnt files) from the [CASIA dataset](http://www.nlpr.ia.ac.cn/databases/handwriting/Offline_database.html). I have included an example .gnt file in this repo, but you can download the rest [here](http://www.nlpr.ia.ac.cn/databases/handwriting/Download.html). You probably want `HWDB1.1trn_gnt` (1873MB) and `HWDB1.1tst_gnt` (471MB).
 
-The model is not yet learning at all, but if you want to try it, run this in the Python interpreter:
+To try it out, run this in the Python interpreter:
 
+    import casia
     import run
-    run.run(3) # 3 epochs
+    import vgg
+    data_store = casia.Casia()
+    model = vgg.vgg16(data_store.x_train[0].shape, len(data_store.y_train[0]))
+    r = run.Run(data_store, model)
+    r.run(3) # 3 epochs
 
 ## CASIA viewer
 
@@ -20,7 +25,7 @@ A viewer for characters from the CASIA dataset. Usage:
 
 My research advisor for this project is [Greg Shakhnarovich](http://ttic.uchicago.edu/~gregory/).
 
-The CNN architecture in `vgg.py` is taken from [this paper](http://arxiv.org/pdf/1409.1556.pdf).
+The CNN architecture `vgg16` is taken from [this paper](http://arxiv.org/pdf/1409.1556.pdf).
 
 Conversion of GB-2312 character codes into displayable strings is accomplished using `encoding.js` and `encoding-indexes.js`, both of which are taken from [inexorabletash/text-encoding](https://github.com/inexorabletash/text-encoding).
 
