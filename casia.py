@@ -4,23 +4,23 @@ import numpy
 import keras.utils.np_utils as np_utils
 import glob
 
-NB_TRAIN_EXAMPLES = 5000
-NB_TEST_EXAMPLES = 1000
 SIDE = 224 # must be a multiple of 32 to work with maxpooling in vgg16
-TARGET_NUM_CLASSES = 64
 
 class Casia:
-  def __init__(self, side=SIDE):
+  def __init__(self, num_classes, side=SIDE):
     self.side = side
-    self.x_train = numpy.zeros((NB_TRAIN_EXAMPLES, 1, self.side, self.side), dtype=float)
-    self.y_train = numpy.zeros((NB_TRAIN_EXAMPLES,), dtype="uint16")
-    self.x_test = numpy.zeros((NB_TEST_EXAMPLES, 1, self.side, self.side), dtype=float)
-    self.y_test = numpy.zeros((NB_TEST_EXAMPLES,), dtype="uint16")
+    self.num_classes = num_classes
+    self.nb_train = num_classes*80
+    self.nb_test = num_classes*16
+    self.x_train = numpy.zeros((self.nb_train, 1, self.side, self.side), dtype=float)
+    self.y_train = numpy.zeros((self.nb_train,), dtype="uint16")
+    self.x_test = numpy.zeros((self.nb_test, 1, self.side, self.side), dtype=float)
+    self.y_test = numpy.zeros((self.nb_test,), dtype="uint16")
     self.labels = []
     self.gnts = iter(glob.glob("gnts/*.gnt"))
     self.file = open(self.gnts.next(), "rb")
-    self.load(self.x_train, self.y_train, NB_TRAIN_EXAMPLES)
-    self.load(self.x_test, self.y_test, NB_TEST_EXAMPLES)
+    self.load(self.x_train, self.y_train, self.nb_train)
+    self.load(self.x_test, self.y_test, self.nb_test)
     self.file.close()
     # categorical_crossentropy loss requires the labels to be binary vectors, not integers.
     # See https://github.com/fchollet/keras/blob/master/keras/utils/np_utils.py#L8
@@ -47,7 +47,7 @@ class Casia:
     width = struct.unpack("<H", self.file.read(2))[0]
     height = struct.unpack("<H", self.file.read(2))[0]
     bytes = struct.unpack("{}B".format(height*width), self.file.read(height*width))
-    if len(self.labels) < TARGET_NUM_CLASSES:
+    if len(self.labels) < self.num_classes:
       self.labels.append(label)
     else:
       if not label in self.labels:

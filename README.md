@@ -9,7 +9,7 @@ To try it out, run this in the Python interpreter:
     import casia
     import run
     import vgg
-    data_store = casia.Casia()
+    data_store = casia.Casia(5)
     model = vgg.vgg16(data_store.x_train[0].shape, len(data_store.y_train[0]))
     r = run.Run(data_store, model)
     r.run(3) # 3 epochs
