@@ -65,7 +65,6 @@ def simple_cnn(input_shape, nb_classes):
 
   model.add(Convolution2D(64, 3, 3, border_mode='same', input_shape=input_shape))
   model.add(Activation('relu'))
-  # Note: Keras does automatic shape inference.
   model.add(Convolution2D(64, 3, 3, border_mode='same'))
   model.add(Activation('relu'))
   model.add(MaxPooling2D(pool_size=(2,2)))

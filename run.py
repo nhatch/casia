@@ -2,8 +2,6 @@ import keras.utils.np_utils as np_utils
 import sys
 from keras import backend as K
 
-# setting batch_size > 16 causes ENOMEM on a GPU
-
 class Run:
   def __init__(self, data, model_constructor):
     self.x = data[0]
@@ -12,6 +10,7 @@ class Run:
     self.yt = data[3]
     self.model = model_constructor(self.x[0].shape, len(self.y[0]))
 
+  # setting batch_size too high can cause ENOMEM
   def run(self, nb_epoch, batch_size=16):
     self.train(nb_epoch, batch_size)
     self.test(batch_size)
@@ -23,8 +22,7 @@ class Run:
     predictions = self.model.predict_classes(self.xt, batch_size=batch_size)
     predictions_c = np_utils.to_categorical(predictions, self.model.output_shape[1])
     incorrect = filter(lambda(i, (x,y)): not all(x == y), enumerate(zip(predictions_c, self.yt)))
-    errors = len(incorrect)
-    print "error rate: {} / {}".format(errors, len(predictions))
+    print "error rate: {} / {}".format(len(incorrect), len(predictions))
 
 
   ### Debugging Tools ###
