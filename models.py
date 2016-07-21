@@ -78,4 +78,3 @@ def simple_cnn(input_shape, nb_classes):
   model.compile(loss='categorical_crossentropy', optimizer=sgd)
   return model
 
-

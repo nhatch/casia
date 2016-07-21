@@ -8,9 +8,10 @@ from collections import defaultdict
 SIDE = 224 # must be a multiple of 32 to work with maxpooling in vgg16
 
 class Casia:
-  def __init__(self, side=SIDE):
+  def __init__(self, gnt_root="gnts", side=SIDE):
     self.side = side
     self.full_data = defaultdict(lambda: [])
+    self.gnt_root = gnt_root
 
   def load_data(self, num_classes):
     prefix = "casia_{}x{}_{}_".format(SIDE, SIDE, num_classes)
@@ -23,7 +24,7 @@ class Casia:
       numpy.save(prefix + suffix + ".npy", data)
 
   def read_all_examples(self, num_classes):
-    for filename in glob.glob("gnts/*.gnt"):
+    for filename in glob.glob(self.gnt_root + "/*.gnt"):
       print filename
       self.read_examples(filename, num_classes)
 
