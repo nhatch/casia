@@ -1,29 +1,12 @@
+#!/bin/bash
+#
 # setup_gpu.sh
 #
 # This script is intended to be run on a newly created EC2 instance. This instance should be using the free Red Hat AMI and the g2.2xlarge or g2.8xlarge hardware. It will set up the instance to the point that it can run the code in this repo.
 #
 # I would copy-paste these instructions a few lines at a time. The script has not been tested to be run all at once.
 
-
-## Copy files from personal computer to EC2 instance.
-## These commands should be run on a personal computer.
-## HOST_ADDR is the address of the EC2 instance you are setting up.
-# cuDNN installer
-# Download archive from https://developer.nvidia.com/rdp/cudnn-download. You will need to create an account and answer some questions about intended use.
-# Look for the latest version of cuDNN that matches CUDA 7.5 for Linux. Also note that as of this writing, the latest version officially supported by Theano is cuDNN 5.0.
-scp -i ~/.ssh/aws_personal.pem ~/Downloads/cudnn-7.5-linux-x64-v* ec2-user@$HOST_ADDR:~
-# SSH key for git account
-scp -i ~/.ssh/aws_personal.pem ~/.ssh/id_rsa ec2-user@$HOST_ADDR:~/.ssh/id_rsa
-# SSH key for other EC2 instances
-scp -i ~/.ssh/aws_personal.pem ~/.ssh/aws_personal.pem ec2-user@$HOST_ADDR:~/.ssh/aws_personal.pem
-# Training and testing data for CASIA
-# See README for information about how to download these. They are large.
-# TODO add these files to S3 or somewhere hosted *not* in China
-scp -i ~/.ssh/aws_personal.pem HWDB1.1tst_gnt.zip ec2-user@$HOST_ADDR:~
-scp -i ~/.ssh/aws_personal.pem HWDB1.1trn_gnt.zip ec2-user@$HOST_ADDR:~
-
-
-# The remaining commands should be run from the EC2 instance home directory.
+set -e
 
 sudo yum install gcc-c++ wget vim unzip
 
@@ -74,7 +57,7 @@ sudo pip install pillow
 sudo pip install h5py # for serializing model weights
 
 # Install cuDNN
-# This archive was scp'd to the EC2 instance in an earlier step
+# This archive was scp'd to the EC2 instance by provision_gpu.sh
 tar -xzvf cudnn*
 sudo cp cuda/lib64/* $CUDA_ROOT/lib64/
 sudo cp cuda/include/cudnn.h $CUDA_ROOT/include/
@@ -82,10 +65,10 @@ sudo cp cuda/include/cudnn.h $CUDA_ROOT/include/
 # Get my code
 sudo yum install git
 git clone git@github.com:nhatch/casia
-[enter passphrase]
 cd casia
 
 # Verify that Theano is configured and able to use the GPU
 # check1.py comes from http://deeplearning.net/software/theano/tutorial/using_gpu.html#using-gpu
-THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python check1.py
+THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python check1.py | grep "Used the gpu"
 
+echo "Done"
