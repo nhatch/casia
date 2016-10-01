@@ -10,12 +10,19 @@ http://www.nlpr.ia.ac.cn/databases/Download/competition/competition-gnt.zip
 
 (\*) **Note:** I have not been able to decompress this particular file. It is very large, it seems to require ALZip to decompress it, and when I use ALZip to decompress it, there is an error about a CRC failure. For this project, I've pooled the latter two datasets and reserved one-fifth of each character's examples as a test dataset.
 
-To try it out, run this in the Python interpreter:
+To try it out, first you will need to preprocess the data. In the following example, we've chosen to generate preprocessed data for only eight of the CASIA character classes. (Trying to do much more than that runs into memory problems when building the model on the GPU. I'm trying to figure out how to fix that.)
+
+    import casia
+    c = casia.Casia()
+    c.read_all_examples(8)
+    c.save_data(8)
+
+Then build and train a model to recognize these characters.
 
     import casia, run, models
     data = casia.Casia().load_data(8)
-    r = run.Run(data, models.simple_cnn)
-    r.run(3) # 3 epochs
+    r = run.Run(data, models.vgg16)
+    r.run(15) # 15 epochs. It takes a while for vgg16 to converge.
 
 Some benchmarks for this dataset:
 http://www.nlpr.ia.ac.cn/events/CHRcompetition2013/competition/ICDAR%202013%20CHR%20competition.pdf (Table 3)

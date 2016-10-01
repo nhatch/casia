@@ -8,7 +8,7 @@ from collections import defaultdict
 SIDE = 224 # must be a multiple of 32 to work with maxpooling in vgg16
 
 class Casia:
-  def __init__(self, gnt_root="gnts", side=SIDE):
+  def __init__(self, gnt_root="/run/gnts", side=SIDE):
     self.side = side
     self.full_data = defaultdict(lambda: [])
     self.gnt_root = gnt_root
