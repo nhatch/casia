@@ -16,7 +16,7 @@ class Run:
     self.test(batch_size)
 
   def train(self, nb_epoch, batch_size=16):
-    self.model.fit(self.x, self.y, batch_size=batch_size, nb_epoch=nb_epoch)
+    self.model.fit(self.x, self.y, validation_split=0.125, batch_size=batch_size, nb_epoch=nb_epoch)
 
   def test(self, batch_size=16):
     predictions = self.model.predict_classes(self.xt, batch_size=batch_size)
