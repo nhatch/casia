@@ -2,7 +2,7 @@
 
 This repo houses the code for a research investigation into recognizing characters with a convolutional neural network (CNN). Eventually it will involve comparing performance (learning speed and accuracy) when trained simultaneously on two alphabets vs. when trained individually on either one of them.
 
-Currently I am merely trying to use [keras](http://keras.io/) to train a CNN that can recognize characters offline isolated characters (.gnt files) from the [CASIA dataset](http://www.nlpr.ia.ac.cn/databases/handwriting/Offline_database.html). I have included an example .gnt file in this repo, but you can download the rest [here](http://www.nlpr.ia.ac.cn/databases/handwriting/Download.html). Specifically:
+Currently I am trying to use [keras](http://keras.io/) to train a CNN that can recognize characters offline isolated characters (.gnt files) from the [CASIA dataset](http://www.nlpr.ia.ac.cn/databases/handwriting/Offline_database.html). I have included an example .gnt file in this repo, but you can download the rest [here](http://www.nlpr.ia.ac.cn/databases/handwriting/Download.html). Specifically:
 
 http://www.nlpr.ia.ac.cn/databases/download/feature_data/HWDB1.1trn_gnt.zip (\*)
 http://www.nlpr.ia.ac.cn/databases/download/feature_data/HWDB1.1tst_gnt.zip
@@ -10,7 +10,11 @@ http://www.nlpr.ia.ac.cn/databases/Download/competition/competition-gnt.zip
 
 (\*) **Note:** I have not been able to decompress this particular file. It is very large, it seems to require ALZip to decompress it, and when I use ALZip to decompress it, there is an error about a CRC failure. For this project, I've pooled the latter two datasets and reserved one-fifth of each character's examples as a test dataset.
 
-To try it out, first you will need to preprocess the data. In the following example, we've chosen to generate preprocessed data for only eight of the CASIA character classes. (Trying to do much more than that runs into memory problems when building the model on the GPU. I'm trying to figure out how to fix that.)
+## Try it out
+
+See provision_gpu.sh, setup_gpu.sh, and extract_gnts.sh for information about setting up the GPU.
+
+After the GPU is set up, you will need to preprocess the data. In the following example, we've chosen to generate preprocessed data for only eight of the CASIA character classes. (Trying to do much more than eight runs into memory problems when building the model on the GPU. I'm trying to figure out how to fix that.)
 
     import casia
     c = casia.Casia()
