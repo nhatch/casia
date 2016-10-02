@@ -2,7 +2,7 @@
 
 This repo houses the code for a research investigation into recognizing characters with a convolutional neural network (CNN). Eventually it will involve comparing performance (learning speed and accuracy) when trained simultaneously on two alphabets vs. when trained individually on either one of them.
 
-Currently I am trying to use [keras](http://keras.io/) to train a CNN that can recognize characters offline isolated characters (.gnt files) from the [CASIA dataset](http://www.nlpr.ia.ac.cn/databases/handwriting/Offline_database.html). I have included an example .gnt file in this repo, but you can download the rest [here](http://www.nlpr.ia.ac.cn/databases/handwriting/Download.html). Specifically:
+Currently I am trying to use [keras](http://keras.io/) to train a CNN that can recognize offline isolated characters (.gnt files) from the [CASIA dataset](http://www.nlpr.ia.ac.cn/databases/handwriting/Offline_database.html). I have included an example .gnt file in this repo, but you can download the rest [here](http://www.nlpr.ia.ac.cn/databases/handwriting/Download.html). Specifically:
 
 http://www.nlpr.ia.ac.cn/databases/download/feature_data/HWDB1.1trn_gnt.zip (\*)
 http://www.nlpr.ia.ac.cn/databases/download/feature_data/HWDB1.1tst_gnt.zip
@@ -12,7 +12,7 @@ http://www.nlpr.ia.ac.cn/databases/Download/competition/competition-gnt.zip
 
 ## Try it out
 
-See provision_gpu.sh, setup_gpu.sh, and extract_gnts.sh for information about setting up the GPU.
+See `provision_gpu.sh`, `setup_gpu.sh`, and `extract_gnts.sh` for information about setting up the GPU.
 
 After the GPU is set up, you will need to preprocess the data. In the following example, we've chosen to generate preprocessed data for only eight of the CASIA character classes. (Trying to do much more than eight runs into memory problems when building the model on the GPU. I'm trying to figure out how to fix that.)
 
@@ -28,8 +28,7 @@ Then build and train a model to recognize these characters.
     r = run.Run(data, models.vgg16)
     r.run(15) # 15 epochs. It takes a while for vgg16 to converge.
 
-Some benchmarks for this dataset:
-http://www.nlpr.ia.ac.cn/events/CHRcompetition2013/competition/ICDAR%202013%20CHR%20competition.pdf (Table 3)
+Some benchmarks for this dataset: Table 3 of [this paper](http://www.nlpr.ia.ac.cn/events/CHRcompetition2013/competition/ICDAR%202013%20CHR%20competition.pdf).
 
 ## CASIA viewer
 
