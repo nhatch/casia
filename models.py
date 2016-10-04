@@ -55,7 +55,8 @@ def vgg16(input_shape, nb_classes):
   model.add(Dense(nb_classes))
   model.add(Activation('softmax'))
 
-  sgd = SGD(lr=0.003, decay=1e-6, momentum=0.3, nesterov=True)
+  # lr decay is accomplished using a custom callback
+  sgd = SGD(lr=0.003, momentum=0.3, nesterov=True)
   # TODO: Should I be using the log-likelihood loss? (refer to VGG paper)
   model.compile(loss='categorical_crossentropy', optimizer=sgd)
   return model
@@ -74,7 +75,7 @@ def simple_cnn(input_shape, nb_classes):
   model.add(Dense(nb_classes))
   model.add(Activation('softmax'))
 
-  sgd = SGD(lr=0.003, decay=1e-6, momentum=0.9, nesterov=True)
+  sgd = SGD(lr=0.003, momentum=0.9, nesterov=True)
   model.compile(loss='categorical_crossentropy', optimizer=sgd)
   return model
 

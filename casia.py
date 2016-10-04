@@ -7,26 +7,65 @@ from collections import defaultdict
 
 SIDE = 224 # must be a multiple of 32 to work with maxpooling in vgg16
 
+class Dataset(object):
+  def __init__(self, x, y):
+    self.x = x
+    self.y = y
+
+  def save(self, name):
+    prefix = "{}_{}x{}_{}_".format(name, self.side(), self.side(), self.num_classes())
+    numpy.save(prefix + "x.npy", self.x)
+    numpy.save(prefix + "y.npy", self.y)
+
+  def side(self):
+    return len(self.x[0][0])
+
+  def num_classes(self):
+    return len(self.y[0])
+
+  # Convert the input into a format usable with Keras
+  # x : an array of numpy.array
+  # y : an array of int
+  @staticmethod
+  def build(x, y):
+    nb_examples = len(y)
+    side = len(x[0][0])
+    converted_x = numpy.zeros((nb_examples, 1, side, side), dtype=float)
+    for i in range(nb_examples):
+      converted_x[i, 0, :, :] = x[i]
+    # categorical_crossentropy loss requires the labels to be binary vectors, not integers.
+    # See https://github.com/fchollet/keras/blob/master/keras/utils/np_utils.py#L8
+    # and http://stackoverflow.com/questions/31997366/python-keras-shape-mismatch-error
+    converted_y = np_utils.to_categorical(y)
+    return Dataset(converted_x, converted_y)
+
+  @staticmethod
+  def load(name, num_classes, side=SIDE):
+    prefix = "{}_{}x{}_{}_".format(name, side, side, num_classes)
+    return Dataset(numpy.load(prefix + "x.npy"), numpy.load(prefix + "y.npy"))
+
 class Casia:
-  def __init__(self, gnt_root="/run/gnts", side=SIDE):
+  def __init__(self, side=SIDE):
     self.side = side
+
+  def load(self, num_classes):
+    self.train = Dataset.load("train", num_classes)
+    self.validate = Dataset.load("validate", num_classes)
+    self.test = Dataset.load("test", num_classes)
+    return self
+
+  def save(self):
+    self.train.save("train")
+    self.validate.save("validate")
+    self.test.save("test")
+
+  def read_all_examples(self, num_classes, gnt_root="/run/gnts"):
     self.full_data = defaultdict(lambda: [])
-    self.gnt_root = gnt_root
-
-  def load_data(self, num_classes):
-    prefix = "casia_{}x{}_{}_".format(SIDE, SIDE, num_classes)
-    return map(lambda suffix: numpy.load(prefix + suffix + ".npy"), ["x", "y", "xt", "yt"])
-
-  def save_data(self, num_classes):
-    data_with_suffixes = zip(self.data(num_classes), ["x", "y", "xt", "yt"])
-    prefix = "casia_{}x{}_{}_".format(SIDE, SIDE, num_classes)
-    for data, suffix in data_with_suffixes:
-      numpy.save(prefix + suffix + ".npy", data)
-
-  def read_all_examples(self, num_classes):
-    for filename in glob.glob(self.gnt_root + "/*.gnt"):
+    for filename in glob.glob(gnt_root + "/*.gnt"):
       print filename
       self.read_examples(filename, num_classes)
+    self.build_datasets(num_classes)
+    return self
 
   def read_examples(self, filename, num_classes):
     f = open(filename, "rb")
@@ -49,31 +88,17 @@ class Casia:
         self.full_data[label].append(image)
     f.close()
 
-  def data(self, num_classes):
-    items = self.full_data.items()
-    items.sort()
-    items_to_use = items[:num_classes]
-    train_data = []
-    train_labels = []
-    test_data = []
-    test_labels = []
-    for label, data in items_to_use:
-      split_point = len(data) * 4 / 5
-      train_data += data[:split_point]
-      test_data += data[split_point:]
-      train_labels += [label]*split_point
-      test_labels += [label]*(len(data) - split_point)
-    nb_train = len(train_labels)
-    nb_test = len(test_labels)
-    x_train = numpy.zeros((nb_train, 1, self.side, self.side), dtype=float)
-    x_test = numpy.zeros((nb_test, 1, self.side, self.side), dtype=float)
-    for i in range(nb_train):
-      x_train[i, 0, :, :] = train_data[i]
-    for i in range(nb_test):
-      x_test[i, 0, :, :] = test_data[i]
-    # categorical_crossentropy loss requires the labels to be binary vectors, not integers.
-    # See https://github.com/fchollet/keras/blob/master/keras/utils/np_utils.py#L8
-    # and http://stackoverflow.com/questions/31997366/python-keras-shape-mismatch-error
-    y_train = np_utils.to_categorical(train_labels)
-    y_test = np_utils.to_categorical(test_labels)
-    return x_train, y_train, x_test, y_test
+  def build_datasets(self, num_classes):
+    classes = self.full_data.items()
+    classes.sort()
+    classes_to_use = classes[:num_classes]
+    data = [[],[],[]]
+    labels = [[],[],[]]
+    split_points = [0.0, 0.7, 0.8, 1.0]
+    for class_label, class_data in classes_to_use:
+      for i in range(len(data)):
+        start_idx = int(len(class_data) * split_points[i])
+        stop_idx = int(len(class_data) * split_points[i+1])
+        data[i] += class_data[start_idx:stop_idx]
+        labels[i] += [class_label]*(stop_idx - start_idx)
+    self.train, self.validate, self.test = map(lambda(x,y): Dataset.build(x,y), zip(data, labels))

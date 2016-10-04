@@ -17,15 +17,13 @@ See `provision_gpu.sh`, `setup_gpu.sh`, and `extract_gnts.sh` for information ab
 After the GPU is set up, you will need to preprocess the data. In the following example, we've chosen to generate preprocessed data for only eight of the CASIA character classes. (Trying to do much more than eight runs into memory problems when building the model on the GPU. I'm trying to figure out how to fix that.)
 
     import casia
-    c = casia.Casia()
-    c.read_all_examples(8)
-    c.save_data(8)
+    c = casia.Casia().read_all_examples(8)
+    c.save()
 
 Then build and train a model to recognize these characters.
 
     import casia, run, models
-    data = casia.Casia().load_data(8)
-    r = run.Run(data, models.vgg16)
+    r = run.Run(casia.Casia().load(8), models.vgg16)
     r.run(15) # 15 epochs. It takes a while for vgg16 to converge.
 
 Some benchmarks for this dataset: Table 3 of [this paper](http://www.nlpr.ia.ac.cn/events/CHRcompetition2013/competition/ICDAR%202013%20CHR%20competition.pdf).
