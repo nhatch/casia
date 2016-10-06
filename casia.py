@@ -88,6 +88,27 @@ class Casia:
         self.full_data[label].append(image)
     f.close()
 
+  def count_all_classes(self, gnt_root="/run/gnts"):
+    self.classes = defaultdict(lambda: 0)
+    for filename in glob.glob(gnt_root + "/*.gnt"):
+      print filename
+      self.count_classes(filename)
+    return self.classes
+
+  def count_classes(self, filename):
+    f = open(filename, "rb")
+    while True:
+      packed_length = f.read(4)
+      if packed_length == '':
+        break
+      length = struct.unpack("<I", packed_length)[0]
+      label = struct.unpack(">H", f.read(2))[0]
+      width = struct.unpack("<H", f.read(2))[0]
+      height = struct.unpack("<H", f.read(2))[0]
+      bytes = struct.unpack("{}B".format(height*width), f.read(height*width))
+      self.classes[label] += 1
+    f.close()
+
   def build_datasets(self, num_classes):
     classes = self.full_data.items()
     classes.sort()

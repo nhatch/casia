@@ -23,7 +23,7 @@ After the GPU is set up, you will need to preprocess the data. In the following 
 Then build and train a model to recognize these characters.
 
     import casia, run, models
-    r = run.Run(casia.Casia().load(8), models.vgg16)
+    r = run.Runner(casia.Casia().load(8), models.vgg16)
     r.run(15) # 15 epochs. It takes a while for vgg16 to converge.
 
 Some benchmarks for this dataset: Table 3 of [this paper](http://www.nlpr.ia.ac.cn/events/CHRcompetition2013/competition/ICDAR%202013%20CHR%20competition.pdf).
