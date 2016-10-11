@@ -61,7 +61,12 @@ class Casia:
 
   def read_all_examples(self, num_classes, gnt_root="/run/gnts"):
     self.full_data = defaultdict(lambda: [])
-    for filename in glob.glob(gnt_root + "/*.gnt"):
+    gnts = glob.glob(gnt_root + "/*.gnt")
+    if len(gnts) == 0:
+      print "No .gnt files found in {}".format(gnt_root)
+      return
+    gnts.sort()
+    for filename in gnts:
       print filename
       self.read_examples(filename, num_classes)
     self.build_datasets(num_classes)
@@ -75,7 +80,6 @@ class Casia:
         break
       length = struct.unpack("<I", packed_length)[0]
       label = struct.unpack(">H", f.read(2))[0]
-      label -= 0xb0a1 # CASIA labels start at 0xb0a1
       width = struct.unpack("<H", f.read(2))[0]
       height = struct.unpack("<H", f.read(2))[0]
       bytes = struct.unpack("{}B".format(height*width), f.read(height*width))
@@ -113,13 +117,12 @@ class Casia:
     classes = self.full_data.items()
     classes.sort()
     classes_to_use = classes[:num_classes]
-    data = [[],[],[]]
-    labels = [[],[],[]]
+    datasets = [[[],[]],[[],[]],[[],[]]]
     split_points = [0.0, 0.7, 0.8, 1.0]
-    for class_label, class_data in classes_to_use:
-      for i in range(len(data)):
+    for class_idx, (class_label, class_data) in enumerate(classes_to_use):
+      for i in range(len(datasets)):
         start_idx = int(len(class_data) * split_points[i])
         stop_idx = int(len(class_data) * split_points[i+1])
-        data[i] += class_data[start_idx:stop_idx]
-        labels[i] += [class_label]*(stop_idx - start_idx)
-    self.train, self.validate, self.test = map(lambda(x,y): Dataset.build(x,y), zip(data, labels))
+        datasets[i][0] += class_data[start_idx:stop_idx]
+        datasets[i][1] += [class_idx]*(stop_idx - start_idx)
+    self.train, self.validate, self.test = [Dataset.build(x,y) for x,y in datasets]
