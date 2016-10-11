@@ -3,6 +3,15 @@ from keras.layers.core import Dense, Dropout, Activation, Flatten
 from keras.layers.convolutional import Convolution2D, MaxPooling2D
 from keras.optimizers import SGD
 
+# Temporary bug workaround
+# https://github.com/fchollet/keras/issues/3857
+# https://github.com/tensorflow/tensorflow/issues/4616
+import tensorflow as tf
+tf.python.control_flow_ops = tf
+
+# TODO change dimension ordering
+# Recent version of keras expects the number of convolutional filters to come *last*, not first.
+
 def vgg16(input_shape, nb_classes):
   model = Sequential()
 

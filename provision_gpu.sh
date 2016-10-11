@@ -13,7 +13,6 @@ SSH_KEY=~/.ssh/aws_personal.pem # SSH key to access the EC2 instance
 # cuDNN installer
 # Download archive from https://developer.nvidia.com/rdp/cudnn-download. You will need to create an account and answer some questions about intended use.
 # Get one of the versions of cuDNN for Linux matching the version of CUDA you will use.
-# As of this writing, the latest version officially supported by Theano is cuDNN 5.0.
 scp -i $SSH_KEY cudnn-7.5-linux-x64-v* ec2-user@$HOST_ADDR:~
 
 # SSH key for git

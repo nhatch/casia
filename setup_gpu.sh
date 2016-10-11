@@ -14,7 +14,9 @@ sudo rpm -i cuda-repo-rhel7-* # ignore NOKEY warning
 DKMS_PKG=dkms-2.2.0.3-34.git.9e0394d.el7.noarch.rpm # version might have been updated, you can find the new version by going to rpmfind.net/linux/epel/7/x86_64/d and ctrl-F for 'dkms'
 wget ftp://rpmfind.net/linux/epel/7/x86_64/d/${DKMS_PKG}
 sudo yum localinstall ${DKMS_PKG} --nogpgcheck
-sudo yum install cuda # this is a big download
+# tensorflow requires cuda 7.5, unless you build it from source
+# (which requires bazel, which requires javac, which requires...?)
+sudo yum install cuda-7.5-18 # this is a big download
 # Gives the following non-fatal error
 # The headers it wants are probably at /usr/src/kernels/3.10.0-327.13.1.el7.x86_64/
 # Maybe a config change could fix?
@@ -25,10 +27,10 @@ sudo yum install cuda # this is a big download
 # warning: %post(nvidia-kmod-1:352.79-2.el7.x86_64) scriptlet failed, exit status 1
 # Non-fatal POSTIN scriptlet failure in rpm package 1:nvidia-kmod-352.79-2.el7.x86_64
 
-echo 'export CUDA_ROOT=/usr/local/cuda/' >> .bashrc
-echo 'export PATH=$PATH:${CUDA_ROOT}bin' >> .bashrc
-echo 'export LD_LIBRARY_PATH=${CUDA_ROOT}lib64' >> .bashrc
-echo "export THEANO_FLAGS='device=gpu,floatX=float32,force_device=True,lib.cnmem=0.95'" >> .bashrc # for theano (installed later)
+echo 'export CUDA_HOME=/usr/local/cuda/' >> .bashrc
+echo 'export PATH=$PATH:${CUDA_HOME}bin' >> .bashrc
+# For some reason, libcublas.so is in lib64/stubs, not lib64.
+echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CUDA_HOME}lib64:${CUDA_HOME}lib64/stubs' >> .bashrc
 source .bashrc
 
 # Verify you have an NVIDIA-compatible GPU
@@ -39,7 +41,7 @@ lspci | grep -i nvidia
 # If you use a more recent version of CUDA, you may need to use a more recent driver.
 # Search for drivers at http://www.nvidia.com/Download/Find.aspx?lang=en-us
 sudo yum install kernel-devel
-wget http://us.download.nvidia.com/XFree86/Linux-x86_64/361.93.02/NVIDIA-Linux-x86_64-361.93.02.run 
+wget http://us.download.nvidia.com/XFree86/Linux-x86_64/352.99/NVIDIA-Linux-x86_64-352.99.run
 chmod +x NVIDIA-Linux-x86_64-*
 KERNEL_SOURCE_PATH=`rpm -ql kernel-devel | head -n1`/
 sudo ./NVIDIA-Linux-x86_64-* --kernel-source-path=${KERNEL_SOURCE_PATH}
@@ -57,18 +59,20 @@ sudo yum install freetype-devel libjpeg-turbo-devel libtiff-devel tcl-devel tk-d
 sudo pip install pillow
 sudo pip install h5py # for serializing model weights
 
+# Install tensorflow
+# See https://www.tensorflow.org/versions/r0.10/get_started/os_setup.html#using-pip
+TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow-0.11.0rc0-cp27-none-linux_x86_64.whl
+sudo pip install --ignore-installed --upgrade $TF_BINARY_URL
+
 # Install cuDNN
 # This archive was scp'd to the EC2 instance by provision_gpu.sh
 tar -xzvf cudnn*
-sudo cp cuda/lib64/* $CUDA_ROOT/lib64/
-sudo cp cuda/include/* $CUDA_ROOT/include/
+sudo cp -L cuda/lib64/* $CUDA_HOME/lib64/
+sudo cp -L cuda/include/* $CUDA_HOME/include/
 
 # Get my code
 sudo yum install git
 git clone git@github.com:nhatch/casia
 
-# Verify that Theano is configured and able to use the GPU
-# check1.py comes from http://deeplearning.net/software/theano/tutorial/using_gpu.html#using-gpu
-THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python casia/check1.py | grep "Used the gpu"
-
 echo "Done"
+
