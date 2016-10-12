@@ -3,6 +3,9 @@ import sys
 from keras import backend as K
 import keras.callbacks
 
+# setting batch_size too high can cause ENOMEM
+BATCH_SIZE=32
+
 class AnnealLearningRate(keras.callbacks.Callback):
   def __init__(self, runner):
     self.runner = runner
@@ -21,18 +24,17 @@ class Runner:
     self.model = model_constructor(data.train.x[0].shape, len(data.train.y[0]))
     self.anneal_lr = AnnealLearningRate(self)
 
-  # setting batch_size too high can cause ENOMEM
-  def run(self, nb_epoch, batch_size=16):
+  def run(self, nb_epoch, batch_size=BATCH_SIZE):
     self.train(nb_epoch, batch_size)
     self.test(batch_size)
 
-  def train(self, nb_epoch, batch_size=16):
+  def train(self, nb_epoch, batch_size=BATCH_SIZE):
     self.model.fit(self.data.train.x, self.data.train.y,
                          validation_data=(self.data.validate.x, self.data.validate.y),
                          batch_size=batch_size, nb_epoch=nb_epoch,
                          callbacks=[self.anneal_lr])
 
-  def test(self, batch_size=16):
+  def test(self, batch_size=BATCH_SIZE):
     predictions = self.model.predict_classes(self.data.test.x, batch_size=batch_size)
     predictions_c = np_utils.to_categorical(predictions, self.model.output_shape[1])
     incorrect = filter(lambda(i, (x,y)): not all(x == y), enumerate(zip(predictions_c, self.data.test.y)))
