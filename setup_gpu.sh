@@ -17,6 +17,8 @@ sudo yum localinstall ${DKMS_PKG} --nogpgcheck
 # tensorflow requires cuda 7.5, unless you build it from source
 # (which requires bazel, which requires javac, which requires...?)
 sudo yum install cuda-7.5-18 # this is a big download
+# Found with `sudo yum provides */libcublas.so`
+sudo yum install cuda-cublas-7-5-7.5-18.x86_64
 # Gives the following non-fatal error
 # The headers it wants are probably at /usr/src/kernels/3.10.0-327.13.1.el7.x86_64/
 # Maybe a config change could fix?
@@ -29,8 +31,7 @@ sudo yum install cuda-7.5-18 # this is a big download
 
 echo 'export CUDA_HOME=/usr/local/cuda/' >> .bashrc
 echo 'export PATH=$PATH:${CUDA_HOME}bin' >> .bashrc
-# For some reason, libcublas.so is in lib64/stubs, not lib64.
-echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CUDA_HOME}lib64:${CUDA_HOME}lib64/stubs' >> .bashrc
+echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CUDA_HOME}lib64' >> .bashrc
 source .bashrc
 
 # Verify you have an NVIDIA-compatible GPU
