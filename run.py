@@ -49,11 +49,11 @@ class Runner:
     for row in img_2d:
       for cell in row:
         if cell < 0.0:
-          v = "#"
+          v = "##"
         elif cell < 0.3:
-          v = "."
+          v = ".."
         else:
-          v = " "
+          v = "  "
         sys.stdout.write(v)
       print
 
