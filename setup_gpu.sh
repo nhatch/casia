@@ -6,7 +6,7 @@
 
 set -e
 
-sudo yum install gcc-c++ wget vim unzip
+sudo yum install gcc-c++ wget vim unzip screen
 
 # Install CUDA
 wget http://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/cuda-repo-rhel7-8.0.44-1.x86_64.rpm
@@ -14,11 +14,9 @@ sudo rpm -i cuda-repo-rhel7-* # ignore NOKEY warning
 DKMS_PKG=dkms-2.2.0.3-34.git.9e0394d.el7.noarch.rpm # version might have been updated, you can find the new version by going to rpmfind.net/linux/epel/7/x86_64/d and ctrl-F for 'dkms'
 wget ftp://rpmfind.net/linux/epel/7/x86_64/d/${DKMS_PKG}
 sudo yum localinstall ${DKMS_PKG} --nogpgcheck
-# tensorflow requires cuda 7.5, unless you build it from source
-# (which requires bazel, which requires javac, which requires...?)
-sudo yum install cuda-7.5-18 # this is a big download
-# Found with `sudo yum provides */libcublas.so`
-sudo yum install cuda-cublas-7-5-7.5-18.x86_64
+# Hopefully it installs a TensorFlow-compatible version.
+# If not, try `sudo yum list cuda`, pick a version, and `sudo yum install cuda-#{version}`
+sudo yum install cuda # this is a big download
 # Gives the following non-fatal error
 # The headers it wants are probably at /usr/src/kernels/3.10.0-327.13.1.el7.x86_64/
 # Maybe a config change could fix?
@@ -42,7 +40,7 @@ lspci | grep -i nvidia
 # If you use a more recent version of CUDA, you may need to use a more recent driver.
 # Search for drivers at http://www.nvidia.com/Download/Find.aspx?lang=en-us
 sudo yum install kernel-devel
-wget http://us.download.nvidia.com/XFree86/Linux-x86_64/352.99/NVIDIA-Linux-x86_64-352.99.run
+wget http://us.download.nvidia.com/XFree86/Linux-x86_64/375.20/NVIDIA-Linux-x86_64-375.20.run
 chmod +x NVIDIA-Linux-x86_64-*
 KERNEL_SOURCE_PATH=`rpm -ql kernel-devel | head -n1`/
 sudo ./NVIDIA-Linux-x86_64-* --kernel-source-path=${KERNEL_SOURCE_PATH}
@@ -61,9 +59,8 @@ sudo pip install pillow
 sudo pip install h5py # for serializing model weights
 
 # Install tensorflow
-# See https://www.tensorflow.org/versions/r0.10/get_started/os_setup.html#using-pip
-TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow-0.11.0rc0-cp27-none-linux_x86_64.whl
-sudo pip install --ignore-installed --upgrade $TF_BINARY_URL
+# See https://www.tensorflow.org/get_started/os_setup#pip_installation
+sudo pip install tensorflow-gpu
 
 # Install cuDNN
 # This archive was scp'd to the EC2 instance by provision_gpu.sh
