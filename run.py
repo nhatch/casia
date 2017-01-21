@@ -60,11 +60,14 @@ class Runner:
   def v(self, img_index):
     self.visualize(self.data.train.x[img_index][0])
 
+  def v_filter(self, layer_idx, filter_idx, img_index):
+    self.visualize(self.inspect_layer(layer_idx, img_index)[0][filter_idx])
+
   # Gives the output of the layer of the model identified by `layer_idx`
-  # when the input is the example identified by `datum_idx`.
+  # when the input is the example identified by `img_index`.
   # Example: inspect_layer(2, 0)
-  def inspect_layer(self, layer_idx, datum_idx):
+  def inspect_layer(self, layer_idx, img_index):
     get_layer_output = K.function([self.model.layers[0].input], [self.model.layers[layer_idx].output])
-    layer_output = get_layer_output([[self.data.train.x[datum_idx]]])[0]
+    layer_output = get_layer_output([[self.data.train.x[img_index]]])[0]
     return layer_output
 
